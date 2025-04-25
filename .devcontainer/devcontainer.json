@@ -1,0 +1,44 @@
+// .devcontainer/devcontainer.json
+{
+    "name": "Rust Axum + Epic OAuth2 DevContainer",
+    "build": {
+      "dockerfile": "Dockerfile",
+      "context": ".."
+    },
+  
+    // Mở workspace folder là root (nơi có Cargo.toml workspace)
+    "workspaceFolder": "/workspace",
+  
+    // Các port service bạn sẽ forward ra host
+    "forwardPorts": [3000],
+  
+    // Chạy command sau khi container khởi xong
+    "postCreateCommand": "just dev",
+  
+    // Extensions VS Code gợi ý cài
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "rust-lang.rust", 
+          "matklad.rust-analyzer",
+          "ms-vscode.cpptools",
+          "vadimcn.vscode-lldb",
+          "tamasfe.even-better-toml",
+          "fill-labs.dependi"
+        ]
+      }
+    },
+  
+    // Mount env file vào container để auto load
+    // Giả sử bạn đặt .env ở root
+    "runArgs": [
+      "--env-file", ".env"
+    ],
+  
+    // Nếu bạn không muốn dùng runArgs, có thể khai báo remoteEnv
+    // "remoteEnv": {
+    //   "EPIC_CLIENT_ID": "${localEnv:EPIC_CLIENT_ID}",
+    //   "...": "..."
+    // }
+  }
+  

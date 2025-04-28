@@ -13,18 +13,19 @@
     "forwardPorts": [3000],
   
     // Chạy command sau khi container khởi xong
-    "postCreateCommand": "just dev",
+    "postCreateCommand": "sudo chown -R $(id -u):$(id -g) /workspace || true && just dev",
   
     // Extensions VS Code gợi ý cài
     "customizations": {
       "vscode": {
         "extensions": [
-          "rust-lang.rust", 
           "matklad.rust-analyzer",
           "ms-vscode.cpptools",
           "vadimcn.vscode-lldb",
           "tamasfe.even-better-toml",
-          "fill-labs.dependi"
+          "fill-labs.dependi",
+          "GitHub.copilot",
+          "GitHub.copilot-chat"
         ]
       }
     },
@@ -41,4 +42,3 @@
     //   "...": "..."
     // }
   }
-  

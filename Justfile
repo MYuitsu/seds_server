@@ -21,7 +21,6 @@ fmt:
 gateway:
     # nạp env và chạy service
     cd services/api-gateway && \
-    source .env && \
     cargo run
     
 # Lint code

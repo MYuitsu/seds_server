@@ -1,6 +1,5 @@
 use figment::{
-    Figment, 
-    providers::{Env, Yaml}
+    providers::{Env, Format, Yaml}, Figment
 };
 use crate::settings::Settings;
 

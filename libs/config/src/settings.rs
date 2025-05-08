@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use figment::{Figment, providers::{Env, Yaml}, FigmentError};
+use figment::{Figment, providers::{Env, Yaml}, error::Error as FigmentError};
 
 /// Cấu hình OAuth2 với Epic
 #[derive(Debug, Deserialize, Clone)]

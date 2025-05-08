@@ -1,7 +1,7 @@
 [workspace]
 members = ["libs/common"
   # sẽ bổ sung sau
-, "libs/config", "libs/event_sourcing", "libs/governance", "libs/messaging", "libs/observability", "libs/performance", "libs/resilience", "libs/security", "services/api-gateway", "services/seds-service", "services/workflow-service"]
+, "libs/config", "libs/event_sourcing", "libs/governance", "libs/messaging", "libs/oauth2", "libs/observability", "libs/performance", "libs/resilience", "libs/security", "services/api-gateway", "services/seds-service", "services/workflow-service"]
 [package]
 name = "seds_server"
 version = "0.1.0"

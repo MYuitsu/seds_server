@@ -13,7 +13,7 @@
     "forwardPorts": [3000],
   
     // Chạy command sau khi container khởi xong
-    "postCreateCommand": "sudo chown -R $(id -u):$(id -g) / || true && just dev",
+    "postCreateCommand": "sudo chown -R $(id -u):$(id -g) /workspace || true && just dev",
   
     // Extensions VS Code gợi ý cài
     "customizations": {

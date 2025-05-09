@@ -1,11 +1,19 @@
 use axum::{extract::State, response::Redirect};
+use tower_sessions::Session;
 use uuid::Uuid;
-use crate::{AppState};
+use crate::di::SharedState;
 
-pub async fn login(State(state): State<AppState>) -> Redirect {
+/// Route /auth/login sử dụng tower_sessions::Session
+pub async fn login(
+    State(state): State<SharedState>,
+    session: Session,
+) -> Redirect {
+    // Tạo state ngẫu nhiên, lưu vào session
     let state_token = Uuid::new_v4().to_string();
-    // lưu state_token vào session (axum-sessions) để verify callback
-    state.session.insert("oauth_state", &state_token).unwrap();
-    let url = state.oauth.authorize_url(&state_token);
-    Redirect::temporary(&url)
+    session.insert("oauth_state", state_token.clone()).await.unwrap();
+
+    // Redirect người dùng lên Epic authorize URL
+    let url = state.oauth.authorize_url(&state_token)
+        .expect("Invalid authorize URL");
+    Redirect::to(&url)
 }

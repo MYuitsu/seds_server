@@ -1,16 +1,36 @@
+mod config;
+mod di;
+mod observability;
+mod resilience;
+mod routes;
+mod features;
+
+use config::Settings;
+use di::SharedState;
+use observability::init_tracing;
+use axum::Router;
+use tokio::net::TcpListener;
+
 #[tokio::main]
-async fn main() {
-    let settings = config_lib::Settings::load().unwrap();
-    let oauth = oauth2_lib::EpicOAuth2::new(settings.oauth2.clone());
-    let session_store = axum_sessions::SessionLayer::new(
-        axum_sessions::memory::MemoryStore::new(), 
-        &settings.session_key
-    );
-    let app = Router::new()
-        .route("/auth/login", get(login))
-        .route("/auth/callback", get(callback))
-        // ... các route khác ...
-        .with_state(AppState { oauth, session: session_store.clone() })
-        .layer(session_store);
-    // ... run server ...
+async fn main() -> anyhow::Result<()> {
+    dotenvy::dotenv().ok();
+    // 1. Init tracing/logging
+    init_tracing();
+
+    // 2. Load settings
+    let settings = Settings::load()?;
+
+    // 3. Build application state
+    let state: SharedState = di::build_state(settings).await?;
+
+    // 4. Build router
+    let app = routes::create_router(&state);
+
+    // 5. Start server (Axum 0.8+)
+    let addr = format!("0.0.0.0:{}", state.settings.port);
+    tracing::info!("Listening on {}", addr);
+    let listener = TcpListener::bind(&addr).await?;
+    axum::serve(listener, app).await?;
+    Ok(())
 }
+

@@ -1,4 +1,4 @@
-use axum::{Router, routing::get};
+use axum::{routing::{any, get}, Router};
 use crate::di::SharedState;
 use crate::features::auth::callback::callback;
 use crate::features::auth::login::login;
@@ -12,8 +12,8 @@ pub fn create_router(state: &SharedState) -> Router {
         .with_expiry(Expiry::OnInactivity(Duration::seconds(600)));
 
     Router::new()
-        .route("/auth/login", get(login))
-        .route("/auth/callback", get(callback))
+        .route("/auth/login", any(<dyn axum::handler::Handler<(), _>>::from_fn(login)))
+        .route("/auth/callback", any(callback))
         .route("/", get(root))
         .layer(session_layer)
         .with_state(state.clone())

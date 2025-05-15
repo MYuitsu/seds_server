@@ -5,7 +5,7 @@ mod resilience;
 mod routes;
 mod features;
 
-use config::Settings;
+use config::{load_settings};
 use di::SharedState;
 use observability::init_tracing;
 use axum::Router;
@@ -18,7 +18,7 @@ async fn main() -> anyhow::Result<()> {
     init_tracing();
 
     // 2. Load settings
-    let settings = Settings::load()?;
+    let settings = load_settings();
 
     // 3. Build application state
     let state: SharedState = di::build_state(settings).await?;

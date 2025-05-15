@@ -1,6 +1,5 @@
 use axum::{extract::State, response::Redirect};
 use tower_sessions::Session;
-use uuid::Uuid;
 use crate::di::SharedState;
 
 /// Route /auth/login sử dụng tower_sessions::Session
@@ -8,12 +7,14 @@ pub async fn login(
     State(state): State<SharedState>,
     session: Session,
 ) -> Redirect {
-    // Tạo state ngẫu nhiên, lưu vào session
-    let state_token = Uuid::new_v4().to_string();
-    session.insert("oauth_state", state_token.clone()).await.unwrap();
+    // Lấy mutable EpicFhirClient từ state (giả sử bạn dùng Arc<Mutex<...>> nếu cần)
+    let mut epic_client = state.epic_client.lock().unwrap();
 
-    // Redirect người dùng lên Epic authorize URL
-    let url = state.oauth.authorize_url(&state_token)
-        .expect("Invalid authorize URL");
-    Redirect::to(&url)
+    // Lấy URL và CSRF token
+    let (auth_url, csrf_token) = epic_client.get_authorization_url().expect("Failed to build Epic authorize URL");
+
+    // Lưu CSRF vào session để kiểm tra ở callback
+    session.insert("oauth_state", csrf_token).await.unwrap();
+
+    Redirect::to(auth_url.as_str())
 }

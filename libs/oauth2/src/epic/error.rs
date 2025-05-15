@@ -1,8 +1,10 @@
 //! Error types for the Epic FHIR OAuth2 client.
 
-use oauth2::RequestTokenError;
+use oauth2::{
+    HttpClientError, RequestTokenError, StandardErrorResponse,
+    basic::{BasicErrorResponse, BasicErrorResponseType},
+};
 use oauth2::reqwest::Error as OAuth2ReqwestError; // Alias for clarity
-use oauth2::basic::BasicErrorResponse; // Alias for StandardErrorResponse<BasicErrorResponseType>
 use oauth2::url;
 
 /// Represents errors that can occur during Epic FHIR OAuth2 interactions.
@@ -23,7 +25,10 @@ pub enum Error {
     /// CSRF token mismatch during the OAuth2 flow.
     CsrfMismatch,
     /// Specific error during the token exchange phase.
-    TokenExchange(RequestTokenError<OAuth2ReqwestError, BasicErrorResponse>),
+    TokenExchange(
+        RequestTokenError<HttpClientError<reqwest::Error>, StandardErrorResponse<BasicErrorResponseType>>
+    ),
+    Other(String),
 }
 
 impl std::fmt::Display for Error {
@@ -35,7 +40,8 @@ impl std::fmt::Display for Error {
             Error::MissingState(s) => write!(f, "Missing state: {}", s),
             Error::TokenNotFound => write!(f, "Access token not found"),
             Error::CsrfMismatch => write!(f, "CSRF token mismatch"),
-            Error::TokenExchange(e) => write!(f, "Token exchange error: {}", e),
+            Error::TokenExchange(e) => write!(f, "Token HTTP client error: {}", e),
+            Error::Other(s) => write!(f, "Other error: {}", s)
         }
     }
 }
@@ -53,4 +59,16 @@ impl std::error::Error for Error {
 
 impl From<url::ParseError> for Error { fn from(err: url::ParseError) -> Self { Error::UrlParse(err) } }
 impl From<reqwest::Error> for Error { fn from(err: reqwest::Error) -> Self { Error::Reqwest(err) } }
-impl From<RequestTokenError<OAuth2ReqwestError, BasicErrorResponse>> for Error { fn from(err: RequestTokenError<OAuth2ReqwestError, BasicErrorResponse>) -> Self { Error::TokenExchange(err) } }
+
+impl From<RequestTokenError<reqwest::Error, BasicErrorResponse>> for Error {
+    fn from(err: RequestTokenError<reqwest::Error, BasicErrorResponse>) -> Self {
+        // Chuyển đổi sang HttpClientError nếu cần, hoặc wrap lại bằng variant khác
+        Error::Other(format!("{err:?}"))
+    }
+}
+
+impl From<RequestTokenError<HttpClientError<reqwest::Error>, StandardErrorResponse<BasicErrorResponseType>>> for Error {
+    fn from(err: RequestTokenError<HttpClientError<reqwest::Error>, StandardErrorResponse<BasicErrorResponseType>>) -> Self {
+        Error::TokenExchange(err)
+    }
+}

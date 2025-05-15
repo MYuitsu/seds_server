@@ -14,6 +14,10 @@ pub struct OAuth2Settings {
     pub redirect_uri: String,
     /// auth_url
     pub auth_url: String,
+    /// Scopes yêu cầu
+    pub scopes: Vec<String>,
+    /// Audience yêu cầu
+    pub audience: String,
 }
 
 /// Cấu hình chung cho API Gateway

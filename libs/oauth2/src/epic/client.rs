@@ -137,13 +137,13 @@ impl EpicFhirClient {
         .build()
         .expect("Client should build");
 
-        let token_result: StandardTokenResponse<EmptyExtraTokenFields, oauth2::basic::BasicTokenType> = self.oauth_client
+        let token_result = self.oauth_client
             .exchange_code(AuthorizationCode::new(auth_code))
             .set_pkce_verifier(pkce_verifier)
-            .request(oauth2_http_client)?;
+            .request(&oauth2_http_client)?;
 
         self.access_token = Some(token_result.access_token().clone());
-        self.refresh_token = token_result.refresh_token();
+        self.refresh_token = token_result.refresh_token().cloned();
         if let Some(duration) = token_result.expires_in() {
             self.expires_at = Some(Instant::now() + duration);
         }

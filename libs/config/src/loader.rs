@@ -1,6 +1,7 @@
 use figment::{
     providers::{Env, Format, Yaml}, Figment
 };
+use figment::error::Error as FigmentError;
 use crate::settings::Settings;
 
 /// Load application settings in this order:
@@ -23,8 +24,8 @@ pub fn load() -> Settings {
         // Finally, override with any APP_* environment variable
         .merge(Env::prefixed("APP_").split("_"));
 
-    // 3. Extract into our Settings struct
+    // 3. Extract into our Settings struct, returning a Result
     figment
         .extract::<Settings>()
-        .unwrap_or_else(|e| panic!("Failed to load configuration: {}", e))
+        .map_err(FigmentError::from).expect("REASON")
 }

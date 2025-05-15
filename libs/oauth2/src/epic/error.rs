@@ -1,0 +1,56 @@
+//! Error types for the Epic FHIR OAuth2 client.
+
+use oauth2::RequestTokenError;
+use oauth2::reqwest::Error as OAuth2ReqwestError; // Alias for clarity
+use oauth2::basic::BasicErrorResponse; // Alias for StandardErrorResponse<BasicErrorResponseType>
+use oauth2::url;
+
+/// Represents errors that can occur during Epic FHIR OAuth2 interactions.
+#[derive(Debug)]
+pub enum Error {
+    /// Error parsing a URL.
+    UrlParse(url::ParseError),
+    /// Generic OAuth2 error, often from the `oauth2` crate.
+    /// It's recommended to make this more specific if possible,
+    /// e.g., by wrapping `RequestTokenError` directly.
+    OAuth2(String),
+    /// Error from the underlying HTTP client (reqwest).
+    Reqwest(reqwest::Error),
+    /// A required state (like PKCE verifier or CSRF token) was missing.
+    MissingState(String),
+    /// Access token was expected but not found.
+    TokenNotFound,
+    /// CSRF token mismatch during the OAuth2 flow.
+    CsrfMismatch,
+    /// Specific error during the token exchange phase.
+    TokenExchange(RequestTokenError<OAuth2ReqwestError, BasicErrorResponse>),
+}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Error::UrlParse(e) => write!(f, "URL parsing error: {}", e),
+            Error::OAuth2(s) => write!(f, "OAuth2 error: {}", s),
+            Error::Reqwest(e) => write!(f, "HTTP request error: {}", e),
+            Error::MissingState(s) => write!(f, "Missing state: {}", s),
+            Error::TokenNotFound => write!(f, "Access token not found"),
+            Error::CsrfMismatch => write!(f, "CSRF token mismatch"),
+            Error::TokenExchange(e) => write!(f, "Token exchange error: {}", e),
+        }
+    }
+}
+
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Error::UrlParse(e) => Some(e),
+            Error::Reqwest(e) => Some(e),
+            Error::TokenExchange(e) => Some(e),
+            _ => None,
+        }
+    }
+}
+
+impl From<url::ParseError> for Error { fn from(err: url::ParseError) -> Self { Error::UrlParse(err) } }
+impl From<reqwest::Error> for Error { fn from(err: reqwest::Error) -> Self { Error::Reqwest(err) } }
+impl From<RequestTokenError<OAuth2ReqwestError, BasicErrorResponse>> for Error { fn from(err: RequestTokenError<OAuth2ReqwestError, BasicErrorResponse>) -> Self { Error::TokenExchange(err) } }

@@ -16,18 +16,10 @@ pub type SharedState = Arc<AppState>;
 
 pub struct AppState {
     pub settings: Settings,
-    pub store: MemoryStore,
     pub epic_client: Mutex<EpicFhirClient>,
 }
 
-#[derive(Clone)]
-pub struct AppMemoryStore(pub MemoryStore); 
 
-#[derive(Clone)]
-pub struct AppSettings(pub Settings); // Newtype bao bọc Settings
-
-#[derive(Clone)]
-pub struct AppEpicClient(pub Arc<Mutex<EpicFhirClient>>);
 
 pub fn session_layer(_settings: &Settings) -> SessionManagerLayer<MemoryStore> {
     let store = MemoryStore::default();
@@ -37,7 +29,7 @@ pub fn session_layer(_settings: &Settings) -> SessionManagerLayer<MemoryStore> {
 }
 
 /// Khởi tạo state gồm Epic OAuth2 client
-pub async fn build_state(settings: Settings, store: MemoryStore) -> anyhow::Result<SharedState> {
+pub async fn build_state(settings: Settings) -> anyhow::Result<SharedState> {
     // Chuyển đổi từ Settings sang EpicFhirConfig
     let epic_config = EpicFhirConfig {
         client_id: settings.oauth2.client_id.clone(),
@@ -49,7 +41,7 @@ pub async fn build_state(settings: Settings, store: MemoryStore) -> anyhow::Resu
         audience: settings.oauth2.audience.clone(),
     };
     let epic_client = EpicFhirClient::new(epic_config)?;
-    let state = AppState { settings, store, epic_client: Mutex::new(epic_client) };
+    let state = AppState { settings, epic_client: Mutex::new(epic_client) };
     Ok(Arc::new(state))
 }
 
@@ -92,22 +84,6 @@ where
     fn from(err: E) -> Self {
         Self(err.into())
     }
-}
-
-pub async fn axum_build_state(settings: Settings, store: MemoryStore) -> anyhow::Result<SharedState> {
-    // Chuyển đổi từ Settings sang EpicFhirConfig
-    let epic_config = EpicFhirConfig {
-        client_id: settings.oauth2.client_id.clone(),
-        client_secret: settings.oauth2.client_secret.clone(),
-        auth_url: settings.oauth2.auth_url.clone(),
-        token_url: settings.oauth2.token_url.clone(),
-        redirect_url: settings.oauth2.redirect_uri.clone(),
-        scopes: settings.oauth2.scopes.clone(),
-        audience: settings.oauth2.audience.clone(),
-    };
-    let epic_client = EpicFhirClient::new(epic_config)?;
-    let state = AppState { settings, store, epic_client: Mutex::new(epic_client) };
-    Ok(Arc::new(state))
 }
 
 fn axum_oauth_client() -> Result<BasicClient, AxumAppError> {

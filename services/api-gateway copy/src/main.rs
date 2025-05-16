@@ -10,19 +10,18 @@ use di::SharedState;
 use observability::init_tracing;
 use axum::Router;
 use tokio::net::TcpListener;
-use tower_sessions::MemoryStore;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
     // 1. Init tracing/logging
     init_tracing();
-    let store = MemoryStore::default();
+
     // 2. Load settings
     let settings = load_settings();
 
     // 3. Build application state
-    let state: SharedState = di::build_state(settings,store).await?;
+    let state: SharedState = di::build_state(settings).await?;
 
     // 4. Build router
     let app = routes::create_router(&state);

@@ -55,6 +55,7 @@ dependencies = [
  "axum",
  "config_lib",
  "dotenvy",
+ "oauth2",
  "oauth2_lib",
  "reqwest",
  "serde",
@@ -1046,12 +1047,15 @@ name = "oauth2_lib"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "axum",
  "config_lib",
  "oauth2",
  "reqwest",
  "serde",
  "serde_json",
  "thiserror 2.0.12",
+ "tracing",
+ "tracing-subscriber",
  "url",
 ]
 

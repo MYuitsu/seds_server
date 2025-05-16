@@ -1,20 +1,27 @@
-use axum::{extract::State, response::Redirect};
-use tower_sessions::Session;
-use crate::di::SharedState;
+use std::sync::Arc;
+
+use axum::{extract::State, response::{IntoResponse, Redirect}};
+use oauth2_lib::epic::{client::EpicFhirClient, error::AxumAppError};
+use tower_sessions::{MemoryStore, Session};
+use crate::di::{AppState, SharedState};
 
 /// Route /auth/login sử dụng tower_sessions::Session
 pub async fn login(
-    State(state): State<SharedState>,
+    State(state): State<Arc<AppState>>,
     session: Session,
-) -> Redirect {
-    // Lấy mutable EpicFhirClient từ state (giả sử bạn dùng Arc<Mutex<...>> nếu cần)
-    let mut epic_client = state.epic_client.lock().unwrap();
+) -> Result<impl IntoResponse, AxumAppError> {
 
-    // Lấy URL và CSRF token
-    let (auth_url, csrf_token) = epic_client.get_authorization_url().expect("Failed to build Epic authorize URL");
+    let (auth_url, csrf_token) = state.epic_client
+        .lock()
+        .map_err(|_| AxumAppError::from(anyhow::anyhow!("Failed to lock EpicFhirClient")))?
+        .get_authorization_url()
+        .map_err(|e| AxumAppError::from(e))?;
 
-    // Lưu CSRF vào session để kiểm tra ở callback
-    session.insert("oauth_state", csrf_token).await.unwrap();
 
-    Redirect::to(auth_url.as_str())
+    session
+        .insert("csrf_token", &csrf_token)
+        .await
+        .map_err(AxumAppError::from)?;
+
+    Ok(Redirect::to(auth_url.as_ref()))
 }

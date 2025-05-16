@@ -10,6 +10,8 @@ use oauth2::reqwest as reqwest_oauth2;
 use crate::epic::config::EpicFhirConfig;
 use crate::epic::error::Error as EpicError;
 
+use super::error::AxumAppError;
+
 /// An OAuth2 client specifically for Epic FHIR.
 ///
 /// This client handles the OAuth2 Authorization Code Grant with PKCE.
@@ -69,7 +71,37 @@ impl EpicFhirClient {
             expires_at: None,
         })
     }
+    pub fn new_epic_fhir_basic_client(config: EpicFhirConfig) -> Result<Client<
+        BasicErrorResponse,
+        BasicTokenResponse,
+        BasicTokenIntrospectionResponse,
+        StandardRevocableToken,
+        BasicRevocationErrorResponse,
+        EndpointSet,
+        EndpointNotSet,
+        EndpointNotSet,
+        EndpointNotSet,
+        EndpointSet,
+    >, AxumAppError> {
+    let client_id = ClientId::new(config.client_id.clone());
+    // Client secret might not be used for public clients with PKCE,
+    // but the oauth2 crate's BasicClient expects it.
+    // If Epic's PKCE flow for public clients doesn't use client_secret in token exchange,
+    // an empty string might be acceptable, or this needs adjustment based on Epic's spec.
+    let client_secret = ClientSecret::new(config.client_secret.clone());
+    let auth_url = AuthUrl::new(config.auth_url.clone())?;
+    let token_url = TokenUrl::new(config.token_url.clone())?;
+    let redirect_url = RedirectUrl::new(config.redirect_url.clone())?;
 
+    let oauth_client = BasicClient::new(client_id)
+        .set_client_secret(client_secret) // May not be strictly needed for PKCE token exchange with public clients
+        .set_auth_uri(auth_url)
+        .set_token_uri(token_url)
+        .set_redirect_uri(redirect_url)
+        ;
+    Ok(oauth_client)
+    }
+    
     /// Generates the authorization URL to redirect the user to.
     ///
     /// This method prepares the PKCE challenge and CSRF token, storing them

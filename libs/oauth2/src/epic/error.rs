@@ -1,11 +1,13 @@
 //! Error types for the Epic FHIR OAuth2 client.
 
+use axum::response::{IntoResponse, Response};
 use oauth2::{
     HttpClientError, RequestTokenError, StandardErrorResponse,
     basic::{BasicErrorResponse, BasicErrorResponseType},
 };
 use oauth2::reqwest::Error as OAuth2ReqwestError; // Alias for clarity
 use oauth2::url;
+use reqwest::StatusCode;
 
 /// Represents errors that can occur during Epic FHIR OAuth2 interactions.
 #[derive(Debug)]
@@ -70,5 +72,27 @@ impl From<RequestTokenError<reqwest::Error, BasicErrorResponse>> for Error {
 impl From<RequestTokenError<HttpClientError<reqwest::Error>, StandardErrorResponse<BasicErrorResponseType>>> for Error {
     fn from(err: RequestTokenError<HttpClientError<reqwest::Error>, StandardErrorResponse<BasicErrorResponseType>>) -> Self {
         Error::TokenExchange(err)
+    }
+}
+#[derive(Debug)]
+pub struct AxumAppError(anyhow::Error);
+
+// Tell axum how to convert `AppError` into a response.
+impl IntoResponse for AxumAppError {
+    fn into_response(self) -> Response {
+        tracing::error!("Application error: {:#}", self.0);
+
+        (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong").into_response()
+    }
+}
+
+// This enables using `?` on functions that return `Result<_, anyhow::Error>` to turn them into
+// `Result<_, AppError>`. That way you don't need to do that manually.
+impl<E> From<E> for AxumAppError
+where
+    E: Into<anyhow::Error>,
+{
+    fn from(err: E) -> Self {
+        Self(err.into())
     }
 }

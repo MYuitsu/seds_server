@@ -75,24 +75,39 @@ impl From<RequestTokenError<HttpClientError<reqwest::Error>, StandardErrorRespon
     }
 }
 #[derive(Debug)]
-pub struct AxumAppError(anyhow::Error);
-
+pub struct AxumAppError {
+    error: anyhow::Error,
+    status_code: StatusCode,
+}
+impl AxumAppError {
+    // Constructor to create AxumAppError from a StatusCode and a message
+    pub fn new(status_code: StatusCode, message: String) -> Self {
+        Self {
+            error: anyhow::anyhow!(message),
+            status_code,
+        }
+    }
+}
 // Tell axum how to convert `AppError` into a response.
 impl IntoResponse for AxumAppError {
     fn into_response(self) -> Response {
-        tracing::error!("Application error: {:#}", self.0);
+        tracing::error!("Application error: {:#}", self.error);
 
-        (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong").into_response()
+        // Use the stored status code
+        (self.status_code, format!("Error: {}", self.error.root_cause())).into_response()
     }
 }
 
 // This enables using `?` on functions that return `Result<_, anyhow::Error>` to turn them into
-// `Result<_, AppError>`. That way you don't need to do that manually.
+// `Result<_, AxumAppError>` with a default status code (e.g., INTERNAL_SERVER_ERROR).
 impl<E> From<E> for AxumAppError
 where
     E: Into<anyhow::Error>,
 {
     fn from(err: E) -> Self {
-        Self(err.into())
+        Self {
+            error: err.into(),
+            status_code: StatusCode::INTERNAL_SERVER_ERROR, // Default status code
+        }
     }
 }

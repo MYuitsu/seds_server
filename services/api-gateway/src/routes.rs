@@ -13,7 +13,7 @@ pub fn create_router(state: &SharedState) -> Router {
 
     Router::new()
         .route("/auth/login", get(login))
-        // .route("/auth/callback", any(callback))
+        .route("/auth/callback", get(callback))
         .route("/", get(root))
         .layer(session_layer)
         .with_state(state.clone())

@@ -12,8 +12,7 @@ pub async fn login(
 ) -> Result<impl IntoResponse, AxumAppError> {
 
     let (auth_url, csrf_token) = state.epic_client
-        .lock()
-        .map_err(|_| AxumAppError::from(anyhow::anyhow!("Failed to lock EpicFhirClient")))?
+        .lock().await
         .get_authorization_url()
         .map_err(|e| AxumAppError::from(e))?;
 

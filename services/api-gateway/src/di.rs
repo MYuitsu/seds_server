@@ -1,5 +1,6 @@
 use std::env;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc};
+use tokio::sync::Mutex;
 use anyhow::Context;
 use axum::extract::FromRef;
 use axum::response::{IntoResponse, Response};

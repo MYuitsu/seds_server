@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::env;
 use std::sync::{Arc};
 use tokio::sync::Mutex;
@@ -18,7 +19,7 @@ pub type SharedState = Arc<AppState>;
 pub struct AppState {
     pub settings: Settings,
     pub store: MemoryStore,
-    pub epic_client: Mutex<EpicFhirClient>,
+    pub oauth_clients: HashMap<String, Arc<Mutex<EpicFhirClient>>>, // Hoặc một kiểu client chung hơn
 }
 
 #[derive(Clone)]
@@ -37,43 +38,59 @@ pub fn session_layer(_settings: &Settings) -> SessionManagerLayer<MemoryStore> {
         .with_expiry(Expiry::OnInactivity(Duration::seconds(600)))
 }
 
-/// Khởi tạo state gồm Epic OAuth2 client
 pub async fn build_state(settings: Settings, store: MemoryStore) -> anyhow::Result<SharedState> {
-    // Chuyển đổi từ Settings sang EpicFhirConfig
-    let epic_config = EpicFhirConfig {
-        client_id: settings.oauth2.client_id.clone(),
-        client_secret: settings.oauth2.client_secret.clone(),
-        auth_url: settings.oauth2.auth_url.clone(),
-        token_url: settings.oauth2.token_url.clone(),
-        redirect_url: settings.oauth2.redirect_uri.clone(),
-        scopes: settings.oauth2.scopes.clone(),
-        audience: settings.oauth2.audience.clone(),
+    let mut oauth_clients_map = HashMap::new();
+
+    for (client_name, client_config_values) in &settings.oauth_clients {
+        // Chuyển đổi từ OAuth2ClientSettings (trong config_lib) sang EpicFhirConfig (trong oauth2_lib)
+        // Hoặc một struct config chung cho client OAuth2 của bạn
+        let epic_config = EpicFhirConfig { // Bạn có thể cần một struct config chung hơn nếu các provider khác nhau nhiều
+            client_id: client_config_values.client_id.clone(),
+            client_secret: client_config_values.client_secret.clone().expect("REASON"),
+            auth_url: client_config_values.auth_url.clone(),
+            token_url: client_config_values.token_url.clone(),
+            redirect_url: client_config_values.redirect_uri.clone(), // Chú ý tên trường
+            scopes: client_config_values.scopes.clone(),
+            audience: client_config_values.audience.clone(),
+            private_key_pem: client_config_values.private_key_pem.clone(),
+            key_id: client_config_values.key_id.clone(),
+            jwt_algorithm: client_config_values.private_key_algorithm.clone(), // Chú ý tên trường
+        };
+        
+        let client = EpicFhirClient::new(epic_config)
+            .map_err(|e| anyhow::anyhow!("Failed to create OAuth client for {}: {:?}", client_name, e))?;
+        oauth_clients_map.insert(client_name.clone(), Arc::new(Mutex::new(client)));
+    }
+
+    let state = AppState {
+        settings,
+        store,
+        oauth_clients: oauth_clients_map,
     };
-    let epic_client = EpicFhirClient::new(epic_config)?;
-    let state = AppState { settings, store, epic_client: Mutex::new(epic_client) };
     Ok(Arc::new(state))
 }
 
+// #[derive(Clone)]
+// struct AxumAppState {
+//     store: MemoryStore,
+//     oauth_client: BasicClient,
+// }
 
-#[derive(Clone)]
-struct AxumAppState {
-    store: MemoryStore,
-    oauth_client: BasicClient,
-}
+// impl FromRef<AxumAppState> for MemoryStore {
+//     fn from_ref(state: &AxumAppState) -> Self {
+//         state.store.clone()
+//     }
+// }
 
-impl FromRef<AxumAppState> for MemoryStore {
-    fn from_ref(state: &AxumAppState) -> Self {
-        state.store.clone()
-    }
-}
+// impl FromRef<AxumAppState> for BasicClient {
+//     fn from_ref(state: &AxumAppState) -> Self {
+//         state.oauth_client.clone()
+//     }
+// }
 
-impl FromRef<AxumAppState> for BasicClient {
-    fn from_ref(state: &AxumAppState) -> Self {
-        state.oauth_client.clone()
-    }
-}
+
 #[derive(Debug)]
-struct AxumAppError(anyhow::Error);
+pub struct AxumAppError(anyhow::Error);
 
 // Tell axum how to convert `AppError` into a response.
 impl IntoResponse for AxumAppError {
@@ -96,18 +113,31 @@ where
 }
 
 pub async fn axum_build_state(settings: Settings, store: MemoryStore) -> anyhow::Result<SharedState> {
-    // Chuyển đổi từ Settings sang EpicFhirConfig
+        let mut oauth_clients_map = HashMap::new();
+
+    for (client_name, client_config_values) in &settings.oauth_clients {
     let epic_config = EpicFhirConfig {
-        client_id: settings.oauth2.client_id.clone(),
-        client_secret: settings.oauth2.client_secret.clone(),
-        auth_url: settings.oauth2.auth_url.clone(),
-        token_url: settings.oauth2.token_url.clone(),
-        redirect_url: settings.oauth2.redirect_uri.clone(),
-        scopes: settings.oauth2.scopes.clone(),
-        audience: settings.oauth2.audience.clone(),
+ client_id: client_config_values.client_id.clone(),
+            client_secret: client_config_values.client_secret.clone().expect("REASON"),
+            auth_url: client_config_values.auth_url.clone(),
+            token_url: client_config_values.token_url.clone(),
+            redirect_url: client_config_values.redirect_uri.clone(), // Chú ý tên trường
+            scopes: client_config_values.scopes.clone(),
+            audience: client_config_values.audience.clone(),
+            private_key_pem: client_config_values.private_key_pem.clone(),
+            key_id: client_config_values.key_id.clone(),
+            jwt_algorithm: client_config_values.private_key_algorithm.clone(),
     };
-    let epic_client = EpicFhirClient::new(epic_config)?;
-    let state = AppState { settings, store, epic_client: Mutex::new(epic_client) };
+    let client = EpicFhirClient::new(epic_config)
+            .map_err(|e| anyhow::anyhow!("Failed to create OAuth client for {}: {:?}", client_name, e))?;
+        oauth_clients_map.insert(client_name.clone(), Arc::new(Mutex::new(client)));
+    }
+
+    let state = AppState {
+        settings,
+        store,
+        oauth_clients: oauth_clients_map,
+    };
     Ok(Arc::new(state))
 }
 
@@ -137,4 +167,5 @@ fn axum_oauth_client() -> Result<BasicClient, AxumAppError> {
     .set_redirect_uri(
         RedirectUrl::new(redirect_url).context("failed to create new redirection URL")?,
     ))
+    
 }

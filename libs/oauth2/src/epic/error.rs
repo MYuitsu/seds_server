@@ -31,6 +31,9 @@ pub enum Error {
         RequestTokenError<HttpClientError<reqwest::Error>, StandardErrorResponse<BasicErrorResponseType>>
     ),
     Other(String),
+    JwtKeyError(String),
+    JwtEncodingError(String),
+    TimeError(String),
 }
 
 impl std::fmt::Display for Error {
@@ -43,7 +46,11 @@ impl std::fmt::Display for Error {
             Error::TokenNotFound => write!(f, "Access token not found"),
             Error::CsrfMismatch => write!(f, "CSRF token mismatch"),
             Error::TokenExchange(e) => write!(f, "Token HTTP client error: {}", e),
-            Error::Other(s) => write!(f, "Other error: {}", s)
+            Error::Other(s) => write!(f, "Other error: {}", s),
+            Error::JwtKeyError(s) => write!(f, "JWT key error: {}", s),
+            Error::JwtEncodingError(s) => write!(f, "JWT encoding error: {}", s),
+            Error::TimeError(s) => write!(f, "Time error: {}", s)
+
         }
     }
 }

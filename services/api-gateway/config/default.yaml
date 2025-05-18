@@ -1,0 +1,51 @@
+# Main application settings
+port: 3000
+host: "127.0.0.1" # Sử dụng "0.0.0.0" nếu bạn muốn gateway lắng nghe trên tất cả các network interface
+base_url: "http://localhost:3000" # URL cơ sở mà người dùng sẽ truy cập gateway
+session_key: "a_very_long_and_secure_random_string_for_development_only_replace_this"
+
+# Cấu hình cho nhiều OAuth2 clients
+oauth_clients:
+  epic_sandbox: # Tên định danh cho client này (ví dụ: "epic_sandbox")
+    client_id: "45c7f20b-158f-4f1c-8746-7348814a65bd"
+    client_secret: "YOUR_EPIC_CLIENT_SECRET" # Cân nhắc dùng biến môi trường APP_EPIC_SANDBOX_OAUTH_CLIENT_SECRET
+    auth_url: "https://fhir.epic.com/interconnect-fhir-oauth/oauth2/authorize"
+    token_url: "https://fhir.epic.com/interconnect-fhir-oauth/oauth2/token"
+    redirect_uri: "http://localhost:3000/epic-sandbox/callback" # Redirect URI cho Epic
+    # private_key_pem: Sẽ được cung cấp qua biến môi trường APP_EPIC_SANDBOX_OAUTH_PRIVATE_KEY_PEM
+    private_key_algorithm: "RS384"
+    key_id: "your-epic-key-id-1"
+    scopes: [
+        "openid",
+        "fhirUser",
+        "launch/patient",
+        "patient/Patient.read",
+        "practitioner/Practitioner.read",
+        "practitioner/PractitionerRole.search",
+        "encounter/Encounter.read",
+        "location/Location.read",
+        "location/Location.search"
+      ]
+    audience: "https://fhir.epic.com/interconnect-fhir-oauth/oauth2/token"
+
+  google: # Tên định danh cho client Google
+    client_id: "YOUR_GOOGLE_CLIENT_ID" # Cân nhắc dùng biến môi trường APP_GOOGLE_OAUTH_CLIENT_ID
+    client_secret: "YOUR_GOOGLE_CLIENT_SECRET" # Cân nhắc dùng biến môi trường APP_GOOGLE_OAUTH_CLIENT_SECRET
+    auth_url: "https://accounts.google.com/o/oauth2/v2/auth"
+    token_url: "https://oauth2.googleapis.com/token"
+    redirect_uri: "http://localhost:3000/google/callback" # Redirect URI cho Google
+    # Google thường không dùng private_key_jwt cho web server flows, nên các trường private_key_* có thể là None/null
+    private_key_pem: null
+    private_key_algorithm: null
+    key_id: null
+    scopes: [
+        "openid",
+        "email",
+        "profile"
+      ]
+    audience: "YOUR_GOOGLE_CLIENT_ID" # Audience cho Google thường là client_id
+
+  # Thêm các nhà cung cấp OAuth2 khác ở đây
+  # another_provider:
+  #   client_id: "..."
+  #   ...

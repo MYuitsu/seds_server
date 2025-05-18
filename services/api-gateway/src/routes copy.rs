@@ -2,6 +2,7 @@ use axum::{routing::{any, get}, Router};
 use crate::di::SharedState;
 use crate::features::auth::callback::callback;
 use crate::features::auth::login::login;
+mod jwks;
 use tower_sessions::{MemoryStore, SessionManagerLayer, Expiry};
 use time::Duration;
 
@@ -12,8 +13,9 @@ pub fn create_router(state: &SharedState) -> Router {
         .with_expiry(Expiry::OnInactivity(Duration::seconds(600)));
 
     Router::new()
-        .route("/auth/login", get(login))
-        .route("/auth/callback", get(callback))
+        .route("/epic-sandbox/login", get(login))
+        .route("/epic-sandbox/callback", get(callback))
+        .route("./.well-known/jwks.json", get(jwks::jwk))
         .route("/", get(root))
         .layer(session_layer)
         .with_state(state.clone())

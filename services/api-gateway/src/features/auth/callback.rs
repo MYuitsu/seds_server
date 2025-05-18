@@ -17,7 +17,7 @@ pub struct CallbackQuery {
     pub state: String,
 }
 #[debug_handler]
-pub async fn callback(
+pub async fn epic_callback_handler(
     State(state): State<Arc<AppState>>,
     Query(query): Query<CallbackQuery>,
     session: Session,
@@ -54,10 +54,16 @@ pub async fn callback(
     //         ))
     //      }
     // };
-    let mut epic_client = state.epic_client.lock().await;
-
+    let app_state = state.as_ref(); // Nếu SharedState là Arc<AppState>
+    let epic_client_arc = app_state.oauth_clients.get("epic_sandbox")
+        .ok_or_else(|| AxumAppError::new(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Epic client not found in state".to_string(),
+        ))?;
+    
+    let mut epic_client = epic_client_arc.lock().await;
     // Đổi code lấy access token
-    match epic_client.exchange_code_for_token(query.code, query.state).await {
+    match epic_client.exchange_code(query.code, query.state).await {
         Ok(token) => {
             // Lưu access token vào session nếu muốn
             if let Err(e) = session.insert("access_token", token.secret()).await {

@@ -17,11 +17,30 @@ async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
     // 1. Init tracing/logging
     init_tracing();
+    tracing::info!("Starting API Gateway...");
+
     let store = MemoryStore::default();
     // 2. Load settings
     let settings = load_settings();
 
-    // 3. Build application state
+    // --- KIỂM TRA CẤU HÌNH OAUTH CLIENTS ---
+    tracing::debug!("Loaded Settings: {:#?}", settings);
+
+    if let Some(epic_config_values) = settings.oauth_clients.get("epic_sandbox") {
+        tracing::info!("Epic Sandbox OAuth2 Client Configuration Loaded:");
+        tracing::info!("  Client ID: {}", epic_config_values.client_id);
+        tracing::info!("  Key ID: {:?}", epic_config_values.key_id);
+        match &epic_config_values.private_key_pem {
+            Some(key_pem) if !key_pem.is_empty() => tracing::info!("  Private Key PEM: Loaded (length: {})", key_pem.len()),
+            Some(_) => tracing::warn!("  Private Key PEM: Loaded but is an empty string!"),
+            None => tracing::warn!("  Private Key PEM: NOT loaded (is None)"),
+        }
+    } else {
+        tracing::error!("Epic Sandbox OAuth2 Client Configuration (epic_sandbox) NOT found in settings.oauth_clients");
+    }
+    // --- KẾT THÚC KIỂM TRA ---
+
+    // 3. Build application state (di::build_state will use the settings)
     let state: SharedState = di::build_state(settings,store).await?;
 
     // 4. Build router
@@ -34,4 +53,3 @@ async fn main() -> anyhow::Result<()> {
     axum::serve(listener, app).await?;
     Ok(())
 }
-

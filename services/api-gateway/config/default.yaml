@@ -12,21 +12,10 @@ oauth_clients:
     auth_url: "https://fhir.epic.com/interconnect-fhir-oauth/oauth2/authorize"
     token_url: "https://fhir.epic.com/interconnect-fhir-oauth/oauth2/token"
     redirect_uri: "http://localhost:3000/epic-sandbox/callback" # Redirect URI cho Epic
-    # private_key_pem: Sẽ được cung cấp qua biến môi trường APP_EPIC_SANDBOX_OAUTH_PRIVATE_KEY_PEM
-    private_key_algorithm: "RS384"
-    key_id: "your-epic-key-id-1"
     scopes: [
-        "openid",
-        "fhirUser",
-        "launch/patient",
-        "patient/Patient.read",
-        "practitioner/Practitioner.read",
-        "practitioner/PractitionerRole.search",
-        "encounter/Encounter.read",
-        "location/Location.read",
-        "location/Location.search"
+        "openid"
       ]
-    audience: "https://fhir.epic.com/interconnect-fhir-oauth/oauth2/token"
+    audience: "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4"
 
   google: # Tên định danh cho client Google
     client_id: "YOUR_GOOGLE_CLIENT_ID" # Cân nhắc dùng biến môi trường APP_GOOGLE_OAUTH_CLIENT_ID
@@ -39,9 +28,7 @@ oauth_clients:
     private_key_algorithm: null
     key_id: null
     scopes: [
-        "openid",
-        "email",
-        "profile"
+        "openid"
       ]
     audience: "YOUR_GOOGLE_CLIENT_ID" # Audience cho Google thường là client_id
 

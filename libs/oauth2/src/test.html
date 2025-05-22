@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html id="HtmlRoot" translate="no" class="notranslate htmlRoot">
+
+<head>
+    <base href="/HSWeb_uscdi/HSWeb_uscdi_1140-1/">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="google" content="notranslate" />
+    <meta content="Yes" http-equiv="MSThemeCompatible" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>Epic</title>
+    <link id="linkShortcutIcon" href="Assets/Core/Images/favicon.ico" type="image/ico" rel="shortcut icon" />
+    <link id="linkIcon" href="Assets/Core/Images/favicon.ico" type="image/ico" rel="icon" />
+    <link id="loginScreen" href="Login/Assets/LoginScreen.css" type="text/css" rel="stylesheet" />
+    <link id="loginScreenCore" href="Login/Assets/LoginScreen-Core.css" type="text/css" rel="stylesheet" />
+    <link id="defaultLoginScreen" href="Login/Assets/LoginScreen.css" disabled="disabled" type="text/css"
+        rel="stylesheet" />
+    <link id="preLoginStyles" href="Login/Assets/PreLogin.css" type="text/css" rel="stylesheet" />
+    <script id="ejdt-path-config"
+        type="application/json">{"AppRootPath":"/HSWeb_uscdi/HSWeb_uscdi_1140-1","WebRootPath":"/HSWeb_uscdi","UrlBarLocation":"/HSWeb_uscdi/?ticket=C7jWAEAXVdYf0YUGvCG0U%2fa3psL2nJr2kPfVmFJvTOeoTKk5yjdUs1DpnNJq7TvGFYNIqb08OI%2frNV33XOLY68Kz4abAmJq8aYLVxSDOziYePcLihiBA4EkiKZA1ws%2fg&client_id=45c7f20b-158f-4f1c-8746-7348814a65bd&redirect_uri=http%3a%2f%2flocalhost%3a3000%2fepic-sandbox%2fcallback&response_type=code&scope=openid+fhirUser+launch%2fpatient&state=jRJ62ZhQ-cXJ2jWfBv2k-w&aud=https%3a%2f%2ffhir.epic.com%2finterconnect-fhir-oauth%2foauth2%2ftoken&code_challenge_method=S256&code_challenge=tfp6djOQjZDEDmGHiho9lTuR3qOnWLkQgK6AbDPFu6Y"}</script>
+    <script id="ejdt-page-data"
+        type="application/json">{"IsDocumentSuccess":false,"LoadingErrorMessage":"Invalid OAuth 2.0 request.","RetryWontHelp":false,"AutoRetryIn":0,"FDADeviceText":"<u>Acknowledgement:</u>\r\nThe default clinical quality measure value sets found in Foundation System are sourced from the Value Set Authority Center (VSAC), developed and maintained by the National Library of Medicine (NLM). The CQM value sets come from versions: eCQM Update 2018 EP-EC and EH to eCQM Update 2024-05-02.\r\n\r\nSome material in the UMLS Metathesaurus is from copyrighted sources of the respective copyright holders. Users of the UMLS Metathesaurus are solely responsible for compliance with any copyright, patent or trademark restrictions and are referred to the copyright, patent or trademark notices appearing in the original sources, all of which are hereby incorporated by reference.\r\n\r\n\r\n----------------------------------------------","DirectLaunchGUID":"","FileLoggingData":[],"PortalPath":"","ShowAdditionalSessionError":false,"EndSessionConfirmationMessage":"Any unsaved Hyperspace data in this browser will be lost.","EndingSessionText":"Ending session and reloading...","RetryButtonText":"Retry","RetryingText":"Retrying..."}</script>
+    <script id="ejdt-script-settings"
+        type="application/json">{"CombineScripts":true,"PreloadOnLoginScreen":true}</script>
+    <script id="ejdt-tracing-settings"
+        type="application/json">{"ConfigFlags":{"CollectCurrentSessions":false},"SupplementalTracingForTypes":{},"SupplementalTracingForCodes":{}}</script>
+    <script id="ejdt-dbserverinfo-primary"
+        type="application/json">{"EnvironmentType":1,"IsInternalEnvironment":false,"IsReadOnly":false}</script>
+    <script src="Shell/Scripts/Default.js" type="text/javascript"></script>
+</head>
+
+<body id="body" role="none presentation" spellcheck="false" class="defaultBody" style="background-color:#0B0B1A;">
+    <noscript id="noscriptTag">
+        <div class="scriptingDisabledWrapper">
+            <p class="scriptingDisabled">Scripting is disabled. Please enable scripting to log in to Hyperspace with a
+                browser.</p>
+        </div>
+    </noscript>
+    <div class="offscrn">
+        <div id="__zFocusSafetyNetEl" tabindex="-1" class="offscrn" aria-hidden="true"></div>
+    </div>
+    <div id="sojFTraps" class="offscrn">
+        <div aria-label="" class="clearLabel _reusable" aria-hidden="true"></div>
+    </div>
+    <div id="screenReaderAlert" class="offscrn" aria-live="polite" role="alert"></div>
+    <div id="divPreLoginAuthentication" class="divPreLoginAuthentication nodisp preLoginAuthenticationScreen">
+        <div id="divPasswordAuthenticationPreLoginViewMode" class="offscrn nodisp" role="form"><input
+                name="txtUserIDPreLoginViewMode" type="text" id="txtUserIDPreLoginViewMode" maxlength="255"
+                spellcheck="false" autocomplete="off" class="loginField" placeholder="User ID" />
+            <div id="divPreLoginPasswordFieldContainer" class="divPasswordFieldContainer classicPreLogin"></div><button
+                id="btnLoginPreLoginViewMode" aria-label="Log In" disabled="disabled" class="loginButton buttonLogin"
+                type="button">L<u>o</u>g In</button><button id="btnCancelPreLoginViewMode" aria-label="Cancel"
+                class="loginButton nodisp buttonCancel" type="button"><u>C</u>ancel</button><button
+                id="btnLogInAnotherWayPreLoginViewMode" aria-label="Log In Another Way"
+                class="loginButton nodisp buttonLogInAnotherWay" type="button">Log In A<u>n</u>other Way</button>
+        </div><button id="btnStartAuthPreLoginViewMode" aria-label="Log In" disabled="disabled"
+            class="loginButton buttonPause" type="button">L<u>o</u>g In</button>
+        <div class="preLoginTopFiller"></div>
+        <div id="preLogin_divShortCopyright" class="shortCopyright"><span id="preLogin_spanShortCR">&#169; 1979-2025
+                Epic Systems Corporation. All rights reserved.</span>&nbsp;<span id="preLogin_spanMoreLink" tabindex="0"
+                class="moreLink" role="link">More<span class="clearLabel">View full copyright information</span></span>
+        </div>
+        <div id="divSecurePreLogin" role="alert" class="nodisp miniSecure"><span id="spanSecureMessagePreLogin"
+                aria-live="assertive" class="secureMessage" aria-atomic="true">Session Is Secured</span><br /><span
+                id="spanSecureUserMessagePreLogin" aria-live="assertive" class="secureUserMessage"
+                aria-atomic="true"></span></div><input id="preLogin_btnZoom" src="Login/Assets/Images/ZOOM_NIGHT.png"
+            class="ZoomButton buttonPreLoginRight nodisp" type="image" /><span id="preLogin_spanErrorMessage"
+            class="offscrn"></span>
+    </div>
+    <form id="formShell" role="none presentation">
+        <div id="divApplicationError" class="night errorContainer">
+            <div class="defaultContainer foregroundContainer">
+                <div class="panel foregroundAdditionalStylingContainer"></div>
+                <div id="divErrorLogo" class="logo logoContainer logo-standard-layout-nobranding">
+                    <div class="logo-main"><img src="Login/Assets/Images/epic-logo.svg" class="epic" /></div>
+                    <div id="divErrorLogoHyperspace" class="logo-hyperspace ">HYPERSPACE<span
+                            class="reg">&reg;</span><span id="spanVersion1" class="version">May 2025</span></div>
+                </div>
+                <div class="errorContent">
+                    <p id="pApplicationError" class="errorMessage">Invalid OAuth 2.0 request.</p>
+                    <div id="dApplicationErrorDetails" class="nodisp"></div>
+                    <p id="pApplicationErrorFooter" class="nodisp"><button id="btnEndSession"
+                            class="endSession buttonCancel" type="button">End Session</button></p>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div id="sojBTraps" class="offscrn">
+        <div aria-label="" class="clearLabel _reusable" aria-hidden="true"></div>
+    </div>
+    <div unselectable="on" _usable="true" class="sojFrm hide"></div>
+</body>
+
+</html>

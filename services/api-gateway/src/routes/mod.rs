@@ -22,11 +22,11 @@ pub fn create_router(state: &SharedState) -> Router { // Đảm bảo SharedStat
 
     Router::new() // Router<()>
         .route("/", get(root_handler)) // Router<()>
-        // .merge(health::health_routes(state)) // health_routes giờ trả về Router<()>, merge thành công -> Router<()>
-        // .merge(auth::routes::auth_routes(state)) // Tương tự -> Router<()>
-        // .merge(jwks::jwks_routes(state)) // Tương tự -> Router<()>
-        // .layer(session_layer) // Áp dụng layer, vẫn là Router<()>
-        .with_state(state.clone().) // Bây giờ self là Router<()>, state.clone() là Arc<AppState>
+        .merge(health::health_routes(state)) // health_routes giờ trả về Router<()>, merge thành công -> Router<()>
+        .merge(auth::routes::auth_routes(state)) // Tương tự -> Router<()>
+        .merge(jwks::jwks_routes(state)) // Tương tự -> Router<()>
+        .layer(session_layer) // Áp dụng layer, vẫn là Router<()>
+        // .with_state(state.clone().) // Bây giờ self là Router<()>, state.clone() là Arc<AppState>
                                    // Kết quả sẽ là Router<Arc<AppState>>, khớp với kiểu trả về.
 }
 

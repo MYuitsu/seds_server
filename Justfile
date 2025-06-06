@@ -8,7 +8,7 @@ build: fetch
 
 # Chạy project chính
 dev:
-    cargo run
+    just frontend & just gateway
 
 # Test toàn bộ workspace
 test:
@@ -22,7 +22,9 @@ gateway:
     # nạp env và chạy service
     cd services/api-gateway && \
     cargo run
-    
+
 # Lint code
 lint:
     cargo clippy --all-targets --all-features -- -D warnings
+frontend:
+    cd frontend && ng serve

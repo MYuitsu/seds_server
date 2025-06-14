@@ -1,1 +1,1 @@
-pub use config_lib::{Settings, settings::OAuth2ClientSettings,load_settings};
+pub use config_lib::{load_settings, settings::OAuth2ClientSettings, Settings};

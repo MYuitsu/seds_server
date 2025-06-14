@@ -16,7 +16,13 @@ fn create_jwk_from_settings(client_settings: &OAuth2ClientSettings) -> Option<se
     if client_settings.private_key_pem.is_none()
         || client_settings.key_id.is_none()
         || client_settings.private_key_algorithm.is_none()
-        || client_settings.private_key_pem.as_ref().unwrap().trim().is_empty() // Also check if PEM is empty
+        || client_settings
+            .private_key_pem
+            .as_ref()
+            .unwrap()
+            .trim()
+            .is_empty()
+    // Also check if PEM is empty
     {
         return None;
     }
@@ -100,7 +106,12 @@ async fn jwks_handler(State(state): State<SharedState>) -> impl axum::response::
         if client_settings.private_key_pem.is_some()
             && client_settings.key_id.is_some()
             && client_settings.private_key_algorithm.is_some()
-            && !client_settings.private_key_pem.as_ref().unwrap().trim().is_empty()
+            && !client_settings
+                .private_key_pem
+                .as_ref()
+                .unwrap()
+                .trim()
+                .is_empty()
         {
             tracing::debug!("Attempting to create JWK for client: {}", _client_name);
             if let Some(jwk) = create_jwk_from_settings(client_settings) {
@@ -111,7 +122,9 @@ async fn jwks_handler(State(state): State<SharedState>) -> impl axum::response::
     Json(json!({ "keys": keys }))
 }
 // Modified jwks_handler to return impl IntoResponse for adding headers
-async fn jwks_handler_with_headers(State(state): State<SharedState>) -> impl axum::response::IntoResponse {
+async fn jwks_handler_with_headers(
+    State(state): State<SharedState>,
+) -> impl axum::response::IntoResponse {
     let json_response = jwks_handler(State(state)).await;
     // Add caching headers as recommended by Epic
     (

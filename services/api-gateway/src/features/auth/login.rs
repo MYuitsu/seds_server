@@ -24,14 +24,14 @@ pub async fn epic_login_handler(
 
     let mut epic_client = epic_client_arc.lock().await; // Lấy MutexGuard
 
-    let (auth_url, csrf_token) = epic_client
-        .get_authorization_url()
-        .map_err(|e| AxumAppError::from(e))?;
-
+    let (auth_url, csrf_token, pkce_verifier) = epic_client.get_authorization_url()?;
+    session.insert("pkce_verifier", &pkce_verifier).await?;
     session
         .insert("csrf_token", &csrf_token)
         .await
         .map_err(AxumAppError::from)?;
+    let session_id = session.id();
+    tracing::info!("LOGIN: session_id={:?}, csrf_token={:?}, pkce_verifier={:?}", session_id, csrf_token, pkce_verifier);
 
     Ok(Redirect::to(auth_url.as_ref()))
 }

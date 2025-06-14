@@ -1,8 +1,9 @@
-use figment::{
-    providers::{Env, Format, Yaml}, Figment
-};
-use figment::error::Error as FigmentError;
 use crate::settings::Settings;
+use figment::error::Error as FigmentError;
+use figment::{
+    Figment,
+    providers::{Env, Format, Yaml},
+};
 
 /// Load application settings in this order:
 /// 1. config/default.yaml

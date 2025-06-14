@@ -29,7 +29,29 @@ pub struct EpicFhirConfig {
 impl EpicFhirConfig {
     /// Creates a new `EpicFhirConfig`.
     /// All parameters are mandatory as they are essential for the OAuth2 flow with Epic.
-    pub fn new(client_id: String, client_secret: String, auth_url: String, token_url: String, redirect_url: String, scopes: Vec<String>, audience: String, private_key_pem: Option<String>, key_id: Option<String>, jwt_algorithm: Option<String>) -> Self {
-        Self { client_id, client_secret, auth_url, token_url, redirect_url, scopes, audience, private_key_pem, key_id, jwt_algorithm }
+    pub fn new(
+        client_id: String,
+        client_secret: String,
+        auth_url: String,
+        token_url: String,
+        redirect_url: String,
+        scopes: Vec<String>,
+        audience: String,
+        private_key_pem: Option<String>,
+        key_id: Option<String>,
+        jwt_algorithm: Option<String>,
+    ) -> Self {
+        Self {
+            client_id,
+            client_secret,
+            auth_url,
+            token_url,
+            redirect_url,
+            scopes,
+            audience,
+            private_key_pem,
+            key_id,
+            jwt_algorithm,
+        }
     }
 }

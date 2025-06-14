@@ -3,8 +3,8 @@
 //! Thư viện cấu hình chung cho toàn workspace.
 //! Cho phép load `Settings` dễ dàng thông qua hàm `load()`.
 
-pub mod settings;
-mod loader; // Giữ loader là private module
+mod loader;
+pub mod settings; // Giữ loader là private module
 
 /// Rút gọn hàm load từ loader
 pub use loader::load as load_settings;

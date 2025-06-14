@@ -1,12 +1,12 @@
 //! Error types for the Epic FHIR OAuth2 client.
 
 use axum::response::{IntoResponse, Response};
-use oauth2::{
-    HttpClientError, RequestTokenError, StandardErrorResponse,
-    basic::{BasicErrorResponse, BasicErrorResponseType},
-};
 use oauth2::reqwest::Error as OAuth2ReqwestError; // Alias for clarity
 use oauth2::url;
+use oauth2::{
+    basic::{BasicErrorResponse, BasicErrorResponseType},
+    HttpClientError, RequestTokenError, StandardErrorResponse,
+};
 use reqwest::StatusCode;
 
 /// Represents errors that can occur during Epic FHIR OAuth2 interactions.
@@ -28,7 +28,10 @@ pub enum Error {
     CsrfMismatch,
     /// Specific error during the token exchange phase.
     TokenExchange(
-        RequestTokenError<HttpClientError<reqwest::Error>, StandardErrorResponse<BasicErrorResponseType>>
+        RequestTokenError<
+            HttpClientError<reqwest::Error>,
+            StandardErrorResponse<BasicErrorResponseType>,
+        >,
     ),
     Other(String),
     JwtKeyError(String),
@@ -49,8 +52,7 @@ impl std::fmt::Display for Error {
             Error::Other(s) => write!(f, "Other error: {}", s),
             Error::JwtKeyError(s) => write!(f, "JWT key error: {}", s),
             Error::JwtEncodingError(s) => write!(f, "JWT encoding error: {}", s),
-            Error::TimeError(s) => write!(f, "Time error: {}", s)
-
+            Error::TimeError(s) => write!(f, "Time error: {}", s),
         }
     }
 }
@@ -66,8 +68,16 @@ impl std::error::Error for Error {
     }
 }
 
-impl From<url::ParseError> for Error { fn from(err: url::ParseError) -> Self { Error::UrlParse(err) } }
-impl From<reqwest::Error> for Error { fn from(err: reqwest::Error) -> Self { Error::Reqwest(err) } }
+impl From<url::ParseError> for Error {
+    fn from(err: url::ParseError) -> Self {
+        Error::UrlParse(err)
+    }
+}
+impl From<reqwest::Error> for Error {
+    fn from(err: reqwest::Error) -> Self {
+        Error::Reqwest(err)
+    }
+}
 
 impl From<RequestTokenError<reqwest::Error, BasicErrorResponse>> for Error {
     fn from(err: RequestTokenError<reqwest::Error, BasicErrorResponse>) -> Self {
@@ -76,8 +86,20 @@ impl From<RequestTokenError<reqwest::Error, BasicErrorResponse>> for Error {
     }
 }
 
-impl From<RequestTokenError<HttpClientError<reqwest::Error>, StandardErrorResponse<BasicErrorResponseType>>> for Error {
-    fn from(err: RequestTokenError<HttpClientError<reqwest::Error>, StandardErrorResponse<BasicErrorResponseType>>) -> Self {
+impl
+    From<
+        RequestTokenError<
+            HttpClientError<reqwest::Error>,
+            StandardErrorResponse<BasicErrorResponseType>,
+        >,
+    > for Error
+{
+    fn from(
+        err: RequestTokenError<
+            HttpClientError<reqwest::Error>,
+            StandardErrorResponse<BasicErrorResponseType>,
+        >,
+    ) -> Self {
         Error::TokenExchange(err)
     }
 }
@@ -101,7 +123,11 @@ impl IntoResponse for AxumAppError {
         tracing::error!("Application error: {:#}", self.error);
 
         // Use the stored status code
-        (self.status_code, format!("Error: {}", self.error.root_cause())).into_response()
+        (
+            self.status_code,
+            format!("Error: {}", self.error.root_cause()),
+        )
+            .into_response()
     }
 }
 

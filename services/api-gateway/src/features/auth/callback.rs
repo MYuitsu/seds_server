@@ -1,15 +1,15 @@
-use std::sync::Arc;
+use crate::di::{AppState, SharedState};
 use axum::{
-    extract::{State, Query},
+    extract::{Query, State},
     http::StatusCode,
-    response::{Redirect, IntoResponse},
+    response::{IntoResponse, Redirect},
 };
 use axum_macros::debug_handler;
 use oauth2_lib::epic::error::AxumAppError;
 use serde::Deserialize;
+use std::sync::Arc;
 use tokio::sync::Mutex;
 use tower_sessions::Session;
-use crate::di::{AppState, SharedState};
 
 #[derive(Deserialize)]
 pub struct CallbackQuery {
@@ -33,9 +33,12 @@ pub async fn epic_callback_handler(
     };
 
     if stored_state.as_deref() != Some(&query.state) {
-        eprintln!("CSRF token mismatch. Stored: {:?}, Received: {:?}", stored_state, query.state);
+        eprintln!(
+            "CSRF token mismatch. Stored: {:?}, Received: {:?}",
+            stored_state, query.state
+        );
         // Redirect về trang login hoặc trả lỗi rõ ràng hơn
-        return Ok(Redirect::to("/auth/login").into_response());
+        return Ok(Redirect::to("/auth/error2").into_response());
     }
 
     // Lấy mutable EpicFhirClient từ state
@@ -55,15 +58,33 @@ pub async fn epic_callback_handler(
     //      }
     // };
     let app_state = state.as_ref(); // Nếu SharedState là Arc<AppState>
-    let epic_client_arc = app_state.oauth_clients.get("epic_sandbox")
-        .ok_or_else(|| AxumAppError::new(
+    let epic_client_arc = app_state.oauth_clients.get("epic_sandbox").ok_or_else(|| {
+        AxumAppError::new(
             StatusCode::INTERNAL_SERVER_ERROR,
             "Epic client not found in state".to_string(),
-        ))?;
-    
+        )
+    })?;
+
     let mut epic_client = epic_client_arc.lock().await;
-    // Đổi code lấy access token
-    match epic_client.exchange_code(query.code, query.state).await {
+    // Đổi code lấy access tokenlet csrf_token: String = session.get("csrf_token").await?.ok_or(...)?;
+    let csrf_token: String = session.get("csrf_token").await?.ok_or_else(|| {
+        AxumAppError::new(
+            StatusCode::UNAUTHORIZED,
+            "CSRF token not found in session".to_string(),
+        )
+    })?;
+    let pkce_verifier: String = session.get("pkce_verifier").await?.ok_or_else(|| {
+        AxumAppError::new(
+            StatusCode::UNAUTHORIZED,
+            "PKCE verifier not found in session".to_string(),
+        )
+    })?;
+    let session_id = session.id();
+    tracing::info!("CALLBACK: session_id={:?}, csrf_token={:?}, pkce_verifier={:?}", session_id, csrf_token, pkce_verifier);
+    match epic_client
+        .exchange_code(query.code, csrf_token, pkce_verifier, query.state)
+        .await
+    {
         Ok(token) => {
             // Lưu access token vào session nếu muốn
             if let Err(e) = session.insert("access_token", token.secret()).await {

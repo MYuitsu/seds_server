@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::di::{AppState, SharedState};
+use crate::{di::{AppState, SharedState}, features::patientsummary};
 use axum::{
     response::Html, // Thêm Html để trả về nội dung HTML đơn giản cho root
     routing::get,
@@ -22,6 +22,7 @@ pub fn create_router(state: &SharedState) -> Router {
         .merge(jwks::jwks_routes(state)) // Tương tự -> Router<()>// Áp dụng layer, vẫn là Router<()>
                                          // .with_state(state.clone().) // Bây giờ self là Router<()>, state.clone() là Arc<AppState>
                                          // Kết quả sẽ là Router<Arc<AppState>>, khớp với kiểu trả về.
+        .merge(patientsummary::routes::patient_summary_routes(state))
 }
 
 /// Handler cho root endpoint ("/")

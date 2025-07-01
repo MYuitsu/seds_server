@@ -16,12 +16,11 @@ export const handler: Handlers = {
 		}
 
 		const resp = await fetch(
-			`http://0.0.0.0:3000/patient_summary/${patientId}`,
+			`http://0.0.0.0:3000/patient/${patientId}/summary`,
 			{
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer demo-key`,
 				},
 			},
 		);

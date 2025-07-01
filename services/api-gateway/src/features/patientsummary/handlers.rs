@@ -27,7 +27,7 @@ pub async fn patient_summary_handler(
 
     // Create the HTTP client and construct the URL
     let client = Client::new();
-    let url = format!("http://0.0.0.0:3000/patient_summary/{}", patient_id);
+    let url = format!("http://0.0.0.0:3010/patient_summary/{}", patient_id);
 
     // Send the request to the downstream service
     let resp = client

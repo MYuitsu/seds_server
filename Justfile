@@ -28,3 +28,18 @@ lint:
     cargo clippy --all-targets --all-features -- -D warnings
 frontend:
     cd frontend && ng serve
+
+# Chạy riêng cả frontend + backend của patient-summary
+patient-summary-dev:
+    just patient-summary-backend &
+    just patient-summary-frontend &
+    wait
+
+# Backend patient-summary
+patient-summary-backend:
+    cd services/patient-summary-service && cargo run
+
+# Frontend patient-summary
+patient-summary-frontend:
+    cd frontend/patient-summary-frontend && \
+    deno task start

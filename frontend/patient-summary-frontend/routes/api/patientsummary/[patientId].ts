@@ -16,12 +16,13 @@ export const handler: Handlers = {
 		}
 
 		const resp = await fetch(
-			`http://0.0.0.0:3000/api/patient/${patientId}/summary`,
+			`https://suddenly-novel-goldfish.ngrok-free.app/api/patient/${patientId}/summary`,
 			{
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
 				},
+				credentials: "include"
 			},
 		);
 		const patientSummary: PatientSummary | null = await resp.json();

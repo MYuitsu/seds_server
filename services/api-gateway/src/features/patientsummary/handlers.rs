@@ -9,22 +9,22 @@ pub async fn patient_summary_handler(
     Path(patient_id): Path<String>,
 ) -> Result<impl IntoResponse, AxumAppError> {
     // Extract the access token from the session
-    let token = String::from("demo-token");
-    // let token = session.get::<String>("access_token").await
-    //     .map_err(|err| {
-    //         tracing::error!("Failed to retrieve access token from session: {}", err);
-    //         AxumAppError::new(
-    //             StatusCode::UNAUTHORIZED,
-    //             format!("Failed to retrieve access token from session: {}", err),
-    //         )
-    //     })?
-    //     .ok_or_else(|| {
-    //         tracing::error!("Access token not found in session");
-    //         AxumAppError::new(
-    //             StatusCode::UNAUTHORIZED,
-    //             "Access token not found in session".to_string(),
-    //         )
-    //     })?;
+    // let token = String::from("demo-token");
+    let token = session.get::<String>("access_token").await
+        .map_err(|err| {
+            tracing::error!("Failed to retrieve access token from session: {}", err);
+            AxumAppError::new(
+                StatusCode::UNAUTHORIZED,
+                format!("Failed to retrieve access token from session: {}", err),
+            )
+        })?
+        .ok_or_else(|| {
+            tracing::error!("Access token not found in session");
+            AxumAppError::new(
+                StatusCode::UNAUTHORIZED,
+                "Access token not found in session".to_string(),
+            )
+        })?;
 
     // Create the HTTP client and construct the URL
     let client = Client::new();

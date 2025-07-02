@@ -16,7 +16,7 @@ export const handler: Handlers = {
 		}
 
 		const resp = await fetch(
-			`http://0.0.0.0:3000/patient/${patientId}/summary`,
+			`http://0.0.0.0:3000/api/patient/${patientId}/summary`,
 			{
 				method: "GET",
 				headers: {

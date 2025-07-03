@@ -9,7 +9,8 @@ import {
 } from "../../../models/summary.ts";
 
 export const handler: Handlers = {
-	async GET(_req, ctx) {
+	async GET(req, ctx) {
+		const cookieHeader = req.headers.get("cookie");
 		const { patientId } = ctx.params;
 		if (!patientId) {
 			return new Response("Patient ID is required", { status: 400 });
@@ -21,6 +22,7 @@ export const handler: Handlers = {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					cookie: cookieHeader ?? ""
 				},
 				credentials: "include"
 			},

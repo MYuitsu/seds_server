@@ -3,20 +3,13 @@ import { Handlers } from "$fresh/server.ts";
 export const handler: Handlers = {
 	GET(_req, _ctx) {
 		const patientIds = [
-			"a1",
-			"b2",
-			"c3",
-			"d4",
-			"e5",
-			"f6",
-			"g7",
-			"h8",
-			"i9",
-			"j10",
-			"k11",
-			"l12",
-			"m13",
-			"n14",
+			"erXuFYUfucBZaryVksYEcMg3",
+			"eq081-VQEgP8drUUqCWzHfw3",
+			"eAB3mDIBBcyUKviyzrxsnAw3",
+			"egqBHVfQlt4Bw3XGXoxVxHg3",
+			"eIXesllypH3M9tAA5WdJftQ3",
+			"eh2xYHuzl9nkSFVvV3osUHg3",
+			"e0w0LEDCYtfckT6N.CkJKCw3",
 		];
 
 		return new Response(JSON.stringify(patientIds), {

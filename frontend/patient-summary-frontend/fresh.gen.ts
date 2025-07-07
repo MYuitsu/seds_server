@@ -7,7 +7,6 @@ import * as $_app from "./routes/_app.tsx";
 import * as $api_patient_ids_index from "./routes/api/patient_ids/index.ts";
 import * as $api_patientsummary_patientId_ from "./routes/api/patientsummary/[patientId].ts";
 import * as $index from "./routes/index.tsx";
-import * as $patientsummary_patientId_index from "./routes/patientsummary/[patientId]/index.tsx";
 import * as $patientsummary_index from "./routes/patientsummary/index.tsx";
 import * as $PatientViewer from "./islands/PatientViewer.tsx";
 import type { Manifest } from "$fresh/server.ts";
@@ -20,8 +19,6 @@ const manifest = {
     "./routes/api/patientsummary/[patientId].ts":
       $api_patientsummary_patientId_,
     "./routes/index.tsx": $index,
-    "./routes/patientsummary/[patientId]/index.tsx":
-      $patientsummary_patientId_index,
     "./routes/patientsummary/index.tsx": $patientsummary_index,
   },
   islands: {

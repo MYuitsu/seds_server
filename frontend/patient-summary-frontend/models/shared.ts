@@ -1,46 +1,47 @@
+export type Text = {
+	"@value": string;
+}
+
 export type Reference = {
-	reference: string | null;
-	display: string | null;
+	reference: Text | null;
+	display: Text | null;
 };
 
 export function renderReference(ref: Reference): string {
-	return ref.display || "Unknown Reference";
+	return ref.display ? ref.display["@value"] : "Unknown Reference";
 }
 
 export type Period = {
-	start: string | null;
-	end: string | null;
+	start: Text | null;
+	end: Text | null;
 };
 
 export function renderPeriod(period: Period): string {
 	const start = period.start
-		? new Date(period.start).toLocaleDateString()
+		? new Date(period.start["@value"]).toLocaleDateString()
 		: "Unknown Start";
 	const end = period.end
-		? new Date(period.end).toLocaleDateString()
+		? new Date(period.end["@value"]).toLocaleDateString()
 		: "Unknown End";
 	return `${start} - ${end}`;
 }
 
 export type Coding = {
-	system: string | null;
-	code: string | null;
-	display: string | null;
+	display: Text | null;
 };
 
 export function renderCoding(coding: Coding): string {
-	return coding.display ||
-		`${coding.code || "Unknown"} (${coding.system || "Unknown System"})`;
+	return coding.display ? coding.display["@value"] : "Unknown";
 }
 
 export type CodeableConcept = {
 	coding: Coding[];
-	text: string | null;
+	text: Text | null;
 };
 
 export function renderCodeableConcept(concept: CodeableConcept): string {
-	if (concept.text) {
-		return concept.text;
+	if (concept.text !== null) {
+		return concept.text["@value"];
 	}
 
 	if (concept.coding && concept.coding.length > 0) {

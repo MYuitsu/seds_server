@@ -4,7 +4,6 @@ import {
 	getEncountersRecord,
 	getPatientRecord,
 	getProceduresRecord,
-	getQuestionnaireResponsesRecord,
 	PatientSummary,
 } from "../../../models/summary.ts";
 
@@ -31,15 +30,12 @@ export const handler: Handlers = {
 		if (!patientSummary) {
 			return new Response("Patient not found", { status: 404 });
 		}
-
+		
 		const patientRecord = getPatientRecord(patientSummary);
 		const encountersRecord = getEncountersRecord(patientSummary);
 		const [inpatientCarePlansRecord, outpatientCarePlansRecord] =
 			getCarePlansRecord(patientSummary);
 		const proceduresRecord = getProceduresRecord(patientSummary);
-		const questionnaireResponsesRecord = getQuestionnaireResponsesRecord(
-			patientSummary,
-		);
 
 		return new Response(
 			JSON.stringify({
@@ -48,7 +44,6 @@ export const handler: Handlers = {
 				inpatientCarePlansRecord,
 				outpatientCarePlansRecord,
 				proceduresRecord,
-				questionnaireResponsesRecord,
 			}),
 			{
 				headers: {

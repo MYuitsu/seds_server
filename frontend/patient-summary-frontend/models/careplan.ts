@@ -1,30 +1,20 @@
-import { CodeableConcept, Period, Reference } from "./shared.ts";
+import { Period, Reference, Text } from "./shared.ts";
 
-export type CarePlanActivityDetail = {
-	kind: string | null;
-	code: CodeableConcept | null;
-	goal: string[];
-	status: string[];
-	doNotPerform: boolean | null;
-	scheduledPeriod: Period | null;
-	performer: Reference | null;
-	description: string | null;
-};
+export type CarePlanId = {
+	"@value": string;
+}
 
-export type CarePlanActivity = {
-	detail: CarePlanActivityDetail | null;
-};
+export type CarePlanCategory = {
+	text: Text;
+}
 
 export type CarePlan = {
-	id: string;
-	status: string | null;
-	intent: string | null;
-	category: CodeableConcept | null;
-	title: string | null;
-	subject: Reference;
-	period: Period | null;
-	created: string | null;
-	author: Reference | null;
-	goal: Reference[];
-	activity: CarePlanActivity[];
+	id: CarePlanId;
+	status: Text;
+	intent: Text;
+	category: CarePlanCategory;
+	period: Period;
+	created: Text;
+	addresses: Reference[] | null;
+	goal: Reference[] | null;
 };

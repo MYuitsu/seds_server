@@ -9,7 +9,6 @@ type PatientSummaryProps = {
 	inpatientCarePlansRecord: Array<TableRecord>;
 	outpatientCarePlansRecord: Array<TableRecord>;
 	proceduresRecord: Array<TableRecord>;
-	questionnaireResponsesRecord: Array<TableRecord>;
 };
 
 export default function PatientViewer() {
@@ -28,6 +27,7 @@ export default function PatientViewer() {
 
 	useEffect(() => {
 		if (!patientId) return;
+		console.log("Fetching summary for:", patientId);
 		const fetchData = async () => {
 			const resp = await fetch(`/api/patientsummary/${patientId}`);
 			const json = await resp.json();

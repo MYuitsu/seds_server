@@ -1,20 +1,42 @@
-import { Coding, Period, Reference, renderReference } from "./shared.ts";
+import { CodeableConcept, Period, Reference, renderCodeableConcept, renderReference, Text } from "./shared.ts";
 
-export type Diagnosis = {
-	condition: Reference | null;
-};
+export type EncounterId = {
+	"@value": string;
+}
 
-export function renderDiagnosis(diagnosis: Diagnosis): string {
-	return diagnosis.condition
-		? renderReference(diagnosis.condition)
-		: "Unknown Diagnosis";
+export type Participant = {
+    type: CodeableConcept | null;
+    individual: ParticipantIndividual;
+}
+
+export function renderParticipant(participant: Participant): string {
+    const strType = participant.type ? renderCodeableConcept(participant.type) : "unknown";
+    const strIndividual = participant.individual.display["@value"] ?? "anonymous";
+
+    return `${strIndividual} (${strType})`;
+}
+
+export type ParticipantIndividual = {
+    type: CodeableConcept | null;
+    display: Text;
+}
+
+export type EncounterLocation = {
+    location: Reference;
+}
+
+export type ServiceProvider = {
+    display: Text;
 }
 
 export type Encounter = {
-	id: string;
-	status: string | null;
-	class: Coding | null;
-	subject: Reference;
-	period: Period | null;
-	diagnosis: Diagnosis[] | null;
+	id: EncounterId,
+    status: Text,
+    class: Reference,
+    type: CodeableConcept[] | null,
+    serviceType: CodeableConcept | null,
+    participant: Participant[],
+    period: Period,
+    location: EncounterLocation[],
+    serviceProvider: ServiceProvider,
 };

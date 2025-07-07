@@ -8,7 +8,6 @@ type PatientSummaryProps = {
 	inpatientCarePlansRecord: Array<TableRecord>;
 	outpatientCarePlansRecord: Array<TableRecord>;
 	proceduresRecord: Array<TableRecord>;
-	questionnaireResponsesRecord: Array<TableRecord>;
 };
 
 export default function PatientSummaryById(
@@ -47,31 +46,14 @@ export default function PatientSummaryById(
 				</CardLayout>
 			))}
 			{data.proceduresRecord.map((record, index) => (
-				record["contentType"] === "Provenance"
-					? (
-						<CardLayout key={record["Provenance ID"]}>
-							<TableData
-								title={`Provenance ${index + 1}`}
-								data={record}
-							/>
-						</CardLayout>
-					)
-					: (
-						<CardLayout key={record["Procedure ID"]}>
-							<TableData
-								title={`Procedure ${index + 1}`}
-								data={record}
-							/>
-						</CardLayout>
-					)
-			))}
-			{data.questionnaireResponsesRecord.map((record, index) => (
-				<CardLayout key={record["Response ID"]}>
-					<TableData
-						title={`Questionnaire Response ${index + 1}`}
-						data={record}
-					/>
-				</CardLayout>
+				(
+					<CardLayout key={record["Procedure ID"]}>
+						<TableData
+							title={`Procedure ${index + 1}`}
+							data={record}
+						/>
+					</CardLayout>
+				)
 			))}
 		</div>
 	);

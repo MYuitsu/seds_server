@@ -11,7 +11,8 @@ oauth_clients:
     client_secret: "YOUR_EPIC_CLIENT_SECRET" # Cân nhắc dùng biến môi trường APP_EPIC_SANDBOX_OAUTH_CLIENT_SECRET
     auth_url: "https://fhir.epic.com/interconnect-fhir-oauth/oauth2/authorize"
     token_url: "https://fhir.epic.com/interconnect-fhir-oauth/oauth2/token"
-    redirect_uri: "http://localhost:3000/epic-sandbox/callback" # Redirect URI cho Epic
+    # redirect_uri: "http://localhost:3000/epic-sandbox/callback" # Redirect URI cho Epic
+    redirect_uri: "https://suddenly-novel-goldfish.ngrok-free.app/epic-sandbox/callback" # Redirect URI cho Epic
     scopes: [
         "openid"
       ]

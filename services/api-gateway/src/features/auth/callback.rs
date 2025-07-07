@@ -91,7 +91,7 @@ pub async fn epic_callback_handler(
                 eprintln!("Session error while inserting access_token: {e:?}");
                 return Err((AxumAppError::from(e)));
             }
-            Ok(Redirect::to("/").into_response()) // Hoặc trang dashboard
+            Ok(Redirect::to("/patientsummary").into_response()) // Hoặc trang dashboard
         }
         Err(e) => {
             // Xử lý lỗi, có thể redirect về trang lỗi hoặc login lại

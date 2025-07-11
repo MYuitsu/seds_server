@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+huggingface_hub
+transformers
+torch
+accelerate
+pillow
+timm

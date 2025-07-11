@@ -33,6 +33,7 @@ frontend:
 patient-summary-dev:
     just patient-summary-backend &
     just patient-summary-frontend &
+    just patient-summary-agent &
     wait
 
 # Backend patient-summary
@@ -43,3 +44,8 @@ patient-summary-backend:
 patient-summary-frontend:
     cd frontend/patient-summary-frontend && \
     deno task start
+
+# Agent patient-summary
+patient-summary-agent:
+    cd services/patient-summary-agent && \
+    uvicorn app.main:app --host 0.0.0.0 --port 3020 --reload

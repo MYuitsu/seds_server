@@ -1,13 +1,30 @@
-use axum::{body::Body, extract::Request, http::{HeaderMap, Uri}, response::{IntoResponse, Response}};
+use axum::{body::{Body, to_bytes}, extract::Request, http::{HeaderMap, Uri}, response::IntoResponse};
 use reqwest::{Client, StatusCode};
 
 pub async fn proxy_fresh(uri: Uri, req: Request<Body>) -> impl IntoResponse {
     let client = Client::new();
     let path = uri.path();
     let full_uri = format!("http://localhost:8000{}", path);
-    let mut fresh_req = client.request(req.method().clone(), &full_uri);
+    let (parts, body) = req.into_parts();
+    let max_body_size = 1024 * 1024; // 1 MB
+    let body_bytes = match to_bytes(body, max_body_size).await {
+        Ok(bytes) => bytes,
+        Err(e) => {
+            eprintln!("Failed to read request body: {}", e);
+            return (
+                StatusCode::BAD_REQUEST,
+                "Failed to read incoming request body",
+            )
+                .into_response();
+        }
+    };
 
-    for (key, value) in req.headers() {
+    // Build the request to Fresh
+    let mut fresh_req = client
+        .request(parts.method.clone(), &full_uri)
+        .body(body_bytes.clone()); // forward body
+
+    for (key, value) in parts.headers.iter() {
         fresh_req = fresh_req.header(key, value);
     }
 

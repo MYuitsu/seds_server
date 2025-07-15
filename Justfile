@@ -48,4 +48,4 @@ patient-summary-frontend:
 # Agent patient-summary
 patient-summary-agent:
     cd services/patient-summary-agent && \
-    uvicorn app.main:app --host 0.0.0.0 --port 3020 --reload
+    uvicorn main:app --host 0.0.0.0 --port 3020 --reload

@@ -1,4 +1,7 @@
 import logging
+import threading
+import time
+from math import ceil
 from fastapi import FastAPI, Query # type: ignore
 from pydantic import BaseModel # type: ignore
 from config import FILE_PATH
@@ -12,12 +15,30 @@ DATA_MAX_SIZE: int
 class PatientSummary(BaseModel):
     summary: dict
 
+def generate_all_notes_background(page: int, size: int, total_pages: int):
+    current_page = page
+    logging.info("Starting background SOAP notes generation...")
+    while current_page <= total_pages:
+        start_time = time.time()
+        logging.info(f"Generating page {current_page}...")
+        try:
+            generate_batch_soap_notes(page=current_page, size=size)
+            logging.info(f"Page {current_page} generated in {time.time() - start_time:.2f} seconds.")
+        except Exception as e:
+            logging.error(f"Failed to generate page {current_page}: {e}")
+        current_page += 1
+
 @app.on_event("startup")
 async def startup():
     global DATA_MAX_SIZE
     DATA_MAX_SIZE = get_total_lines(FILE_PATH)
-    logging.info("Warming up first page of SOAP notes...")
-    generate_batch_soap_notes(page=1, size=2)
+    size = 2
+    total_pages = ceil(DATA_MAX_SIZE / size)
+    threading.Thread(
+        target=generate_all_notes_background, 
+        args=(1, size, total_pages), 
+        daemon=True
+    ).start()
 
 @app.post("/advice")
 async def get_advice(payload: PatientSummary):

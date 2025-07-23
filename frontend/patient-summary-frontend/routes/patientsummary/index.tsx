@@ -9,7 +9,7 @@ export default function PatientSummaryPage() {
 					<div className="text-lg font-semibold">Medical Agent</div>
 					<div className="space-x-4">
 						<a href="/" className="hover:underline">Home</a>
-						<a href="/patientsummary" className="hover:underline">Patient Summary</a>
+						<a href="/patientsummary/demo" className="hover:underline">Demo Patient Summary</a>
 						<a href="/soapnotes" className="hover:underline">SOAP Notes</a>
 					</div>
 				</div>

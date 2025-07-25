@@ -1,9 +1,10 @@
 import CardLayout from "../components/CardLayout.tsx";
 import SelectorButton from "../components/SelectorButton.tsx";
-import { Observation, selectedEncounter, selectedObservation } from "../signals/patientSummary.ts";
+import { Observation, selectedEncounter, selectedObservation, groupedObservations } from "../signals/patientSummary.ts";
 import { formatterDateTime } from "../utils/formatter.ts";
 
 export default function ObservationSelector() {
+    console.log(groupedObservations.value);
     return selectedEncounter.value && (
         <CardLayout>
             <div className="flex overflow-x-auto whitespace-nowrap space-x-4 p-2">

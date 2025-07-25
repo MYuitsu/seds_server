@@ -1,4 +1,4 @@
-import { signal } from "@preact/signals";
+import { signal, computed } from "@preact/signals";
 
 export const selectedPatientId = signal<Patient['id'] | null>(null);
 export const selectedPatient = signal<Patient | null>(null);
@@ -7,6 +7,23 @@ export const selectedObservation = signal<Observation | null>(null);
 export const selectedCondition = signal<Condition | null>(null);
 export const selectedStudy = signal<ImagingStudy | null>(null);
 export const selectedDiagnosis = signal<DiagnosisReport | null>(null);
+
+export const groupedObservations = computed(() => {
+    const patient = selectedPatient.value;
+    if (!patient) return;
+    const grouped: Record<string, Record<string, Observation[]>> = {};
+    for (const encounter of patient.encounters) {
+        for (const obs of encounter.observations) {
+            const category = obs.category[0]?.coding[0]?.display ?? "unknown";
+            const code = obs.code.text;
+            if (!grouped[category]) grouped[category] = {};
+            if (!grouped[category][code]) grouped[category][code] = [];
+            grouped[category][code].push(obs);
+        }
+    }
+    console.log(grouped);
+    return grouped;
+});
 
 export type Patient = {
     id: string;

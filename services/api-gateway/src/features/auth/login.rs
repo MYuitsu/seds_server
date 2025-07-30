@@ -33,5 +33,6 @@ pub async fn epic_login_handler(
     let session_id = session.id();
     tracing::info!("LOGIN: session_id={:?}, csrf_token={:?}, pkce_verifier={:?}", session_id, csrf_token, pkce_verifier);
 
+    // Ok(Redirect::to("/patientsummary"))
     Ok(Redirect::to(auth_url.as_ref()))
 }

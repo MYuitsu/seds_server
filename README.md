@@ -4,9 +4,10 @@
 
 - Docker
 - Domain Name (e.g. Ngrok free domain)
-  - Cài đặt cli tool để đăng ký domain (e.g. [Ngrok](https://ngrok.com/docs/getting-started/))
-  - Tạo một domain và thay thế `redirect_uri` trong [default.yml](services/api-gateway/config/default.yaml) thành `https://your-ngrok-domain/epic-sandbox/callback`
-  - Thêm `redirect_uri` vào `callback uri` của [SEDS](https://fhir.epic.com/Developer/Apps) trên FHIR
+   - Cài đặt cli tool để đăng ký domain (e.g. [Ngrok](https://ngrok.com/docs/getting-started/))
+   - Tạo một domain và thay thế `redirect_uri` trong [default.yml](services/api-gateway/config/default.yaml) thành `https://your-ngrok-domain/epic-sandbox/callback`
+   - Thêm `redirect_uri` vào `callback uri` của [SEDS](https://fhir.epic.com/Developer/Apps) trên FHIR
+
 - [Đăng ký Hugging face](https://huggingface.co/docs/hub/en/oauth) và tạo access token
 
 ## Chạy dự án
@@ -43,10 +44,48 @@ huggingface-cli login --token <your-hugging-face-access-token>
 just gateway & just patient-summary-dev
 ```
 
-**Note:**
-- `just gateway` sẽ khởi động gateway service
-- `just patient-summary-dev` sẽ khởi động 3 services (backend, frontend, và AI agent) của chức năng patient summary.
-- Sau khi các services đã khởi động xong, chuyển sang terminal của máy host.
+**Giải thích các câu lệnh trong Justfile:**
+
+1. **just gateway**
+
+ - **Chức năng:** Khởi động `api-gateway`, một cổng chính giao tiếp giữa frontend và backend.
+ - **Port:** `0.0.0.0:3000`
+ - **Công nghệ:** Rust + Axum
+ - **Truy cập:** `http://localhost:3000`
+ - **Yêu cầu:** Cần các backend service đã được khởi động trước.
+
+2. **just patient-summary-dev**
+
+  - **Chức năng:** Alias để khởi động nhanh toàn bộ chức năng `patient-summary`.
+  - **Bao gồm:**
+    - `just patient-summary-backend`
+    - `just patient-summary-frontend`
+    - `just patient-summary-agent`
+ - **Lưu ý:** Nên chạy lệnh này để chuẩn bị môi trường phát triển nhanh chóng.
+
+3. **just patient-summary-backend**
+
+ - **Chức năng:** Khởi động `patient-summary-service`, tổng hợp hồ sơ bệnh nhân từ các API FHIR liên quan.
+ - **Port:** `0.0.0.0:3010`
+ - **Công nghệ:** Rust + Axum
+ - **Truy cập:** `http://localhost:3010`
+
+4. **just patient-summary-frontend**
+
+ - **Chức năng:**  Khởi động giao diện người dùng cho hệ thống `patient-summary`.
+ - **Port:** `localhost:8000`
+ - **Công nghệ:** Deno + Fresh
+ - **Truy cập:** `http://localhost:8000`
+
+5. **just patient-summary-agent**
+
+ - **Chức năng:** khởi động `patient-summary-agent`, một AI agent chạy trên CPU của Container, giúp đưa ra lời khuyên y tế từ hồ sơ bệnh nhân.
+ - **Port:** `0.0.0.0:3020`
+ - **Công nghệ:** Python + FastAPI + huggingface_hub
+ - **Tên agent:** google/gemma-1.1-2b-it
+ - **Truy cập:** `http://localhost:3020`
+ - **Yêu cầu:** Đăng nhập hugging face bằng access token thông qua huggingface-cli tool được cài trong container.
+ 
 
 ## 3. Kết nối gateway đến domain
 

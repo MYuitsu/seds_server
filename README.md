@@ -28,7 +28,7 @@ docker run -it -p 3000:3000 seds_server
 
 **Note:** `-p 3000:3000` cho phép Domain kết nối vào container thông qua `localhost:3000`
 
-## 2. Setup và Chạy Services
+### 2. Setup và Chạy Services
 
 Bên trong Docker container:
 
@@ -87,7 +87,7 @@ just gateway & just patient-summary-dev
  - **Yêu cầu:** Đăng nhập hugging face bằng access token thông qua huggingface-cli tool được cài trong container.
  
 
-## 3. Kết nối gateway đến domain
+### 3. Kết nối gateway đến domain
 
 Tuỳ vào nhà cung cấp domain, trong trường hợp này là Ngrok
 
@@ -97,8 +97,24 @@ Tuỳ vào nhà cung cấp domain, trong trường hợp này là Ngrok
 ngrok http 3000 --domain=<your-ngrok-domain>
 ```
 
-## 4. Vào ứng dụng
+### 4. Vào ứng dụng
 
 Đi đến đường dẫn: `https://<your-ngrok-domain>`
 
 Đăng nhập [FHIR](https://fhir.epic.com/Home) bằng tài khoảng mẫu có trong sand box
+
+## Phát triển độc lập từng server
+
+Do FHIR OAuth dùng trong api-gateway yêu cầu một domain hợp lệ (ví dụ: `https://<domain-name>`), nên việc kiểm thử end-to-end hoàn chỉnh trên môi trường `localhost` là không khả thi.
+
+Thay vào đó, trong quá trình phát triển, nên áp dụng các phương pháp sau:
+
+1. **Kiểm thử tích hợp (Integration Testing)**
+
+ - Sử dụng các framework kiểm thử phù hợp để kiểm tra từng thành phần của server một cách độc lập.
+
+2. **Kiểm thử API trong container**
+
+ - Mở các cổng cần thiết và chạy các service trong container. Cách này giúp kiểm thử API trong môi trường gần giống thực tế mà không cần cấu hình đầy đủ OAuth domain.
+
+Các phương pháp này giúp đảm bảo từng service hoạt động đúng mà không phụ thuộc vào cấu hình đầy đủ của hệ thống xác thực OAuth.
